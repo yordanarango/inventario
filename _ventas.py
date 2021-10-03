@@ -177,7 +177,7 @@ class Ventas:
 		#------------------------------------- Crea las tablas -------------------------------------------
 
 		self.dataCols5 = ('code', 'name', 'amount')
-		self.dataCols6 = ('code', 'name', 'amount', 'precio_compra', 'precio_venta', 'provider', 'forma_pago', 'min_precio') # , 'existe_factura')
+		self.dataCols6 = ('code', 'name', 'amount', 'precio_compra', 'precio_venta', 'provider', 'forma_pago', 'min_precio', 'new_item') # , 'existe_factura')
 		self.tree5 = ttk.Treeview(self.ventana_new_prod, columns=self.dataCols5)
 		self.tree6 = ttk.Treeview(self.ventana_new_prod, columns=self.dataCols6)
 
@@ -201,6 +201,7 @@ class Ventas:
 		self.tree6.heading('provider', text='Proveedor', anchor=W)
 		self.tree6.heading('forma_pago', text=u'Método', anchor=W)
 		self.tree6.heading('min_precio', text=u'Precio Min.', anchor=W)
+		self.tree6.heading('new_item', text=u'Item nuevo', anchor=W)
 		#self.tree6.heading('existe_factura', text=u'Ex.Fac', anchor=W)
 
 		self.tree5.column('#0',   stretch=1, width=0, anchor=W)
@@ -217,6 +218,8 @@ class Ventas:
 		self.tree6.column('provider', stretch=1, width=150, anchor=W)
 		self.tree6.column('forma_pago', stretch=1, width=100, anchor=W)
 		self.tree6.column('min_precio', stretch=1, width=120, anchor=W)
+		self.tree6.column('new_item', stretch=1, width=80, anchor=W)
+
 		#self.tree6.column('existe_factura', stretch=1, width=100, anchor=W)
 
 		# add tree5 and scrollbars to frame
@@ -234,7 +237,7 @@ class Ventas:
 
 		boton_add_np  = self.agrega_boton(self.ventana_new_prod, 'Agregar producto de la tabla', 0, 6, comando=self.select_new_product, pad=(3,3), grid=True)
 		boton_add_np.grid(columnspan=2) 		
-		boton_add_np2 = self.agrega_boton(self.ventana_new_prod, 'Agregar producto nuevo', 0, 7, pad=(3,3), grid=True)
+		boton_add_np2 = self.agrega_boton(self.ventana_new_prod, 'Agregar producto nuevo', 0, 7, comando=self.select_new_item, pad=(3,3), grid=True)
 		boton_add_np2.grid(columnspan=2)
 		
 		boton_add_np3 = self.agrega_boton(self.ventana_new_prod, 'Ingresar productos al inventario', 0, 13, comando=self.ingresar_al_inventario_pn1, pad=(3,3), grid=True)
@@ -258,10 +261,561 @@ class Ventas:
 
 		self.final_otra_ventana(self.ventana_new_prod, self.ventana_vender)
 
+
+	def select_new_item(self): #, e):
+
+		if len(self.tree5.selection()[:]) == 0:
+
+			self.datos_new_item()
+
+		elif len(self.tree5.selection()[:]) >= 1:
+
+			self.notifica = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Seleccionó un producto de la tabla. ¿Acaso desea agregar un producto que ya existe en la base de datos?', 0, 1, grid=True)
+			self.etiqueta(self.notifica, u'Por favor seleccione bien sus opciones', 0, 2, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_new_prod)
+
+	def datos_new_item(self):
+
+		self.ventana_datos_new_prod = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Información nuevo producto', 2, 11, exitgrid=True)
+
+		#--------------------------------------- seccion de búsqueda del proveedor ---------------------------------------
+
+		#selected      = self.tree5.focus()
+		#values        = self.tree5.item(selected, 'values')
+		#name          = values[1]
+
+		lbl_busca_provee = self.etiqueta(self.ventana_datos_new_prod, u'Buscar Proveedor', 0, 0, grid=True)
+		self.box_busca_provee_np  = self.caja_texto(self.ventana_datos_new_prod, 1.4, 25, locate_x=2, locate_y=0, grid=True)
+
+		self.etiqueta(self.ventana_datos_new_prod, u'Proveedores Históricos', 0, 1, grid=True)#.grid(columnspan=2)
+		#------------------------------------- Crea las tablas -------------------------------------------
+
+		self.dataCols8 = ('proveedor', 'cc')
+		self.tree8 = ttk.Treeview(self.ventana_datos_new_prod, columns=self.dataCols8)
+
+		ysb8 = ttk.Scrollbar(self.ventana_datos_new_prod, orient=VERTICAL, command= self.tree8.yview)
+		self.tree8['yscroll'] = ysb8.set
+
+		self.tree8.heading('#0',   text='')
+		self.tree8.heading('proveedor', text=u'Proveedor', anchor=W)
+		self.tree8.heading('cc', text=u'', anchor=W)
+
+		self.tree8.column('#0',   stretch=1, width=0, anchor=W)
+		self.tree8.column('proveedor', stretch=1, width=500, anchor=W)
+		self.tree8.column('cc', stretch=1, width=0, anchor=W)
+
+		# add tree5 and scrollbars to frame
+		self.tree8.grid(row=2, column=0, columnspan=3, rowspan=4, sticky=NSEW, padx=10, pady=10)
+
+		ysb8.grid(row=2, column=3, rowspan=4, sticky=NS, pady=10)
+
+		# set frame resizing priorities
+		self.ventana_datos_new_prod.rowconfigure(0, weight=1)
+		self.ventana_datos_new_prod.columnconfigure(0, weight=1)
+
+		#--------------------------------------- seccion de todos los datos  ---------------------------------------
+		self.etiqueta(self.ventana_datos_new_prod, u'Nombre nuevo item', 5, 1, grid=True)
+		self.box_item_np          = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=1, grid=True)
+		self.box_item_np.grid(columnspan=2)
+		self.etiqueta(self.ventana_datos_new_prod, u'Proveedor', 5, 2, grid=True)
+		self.box_provee_np          = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=2, grid=True)
+		self.box_provee_np.grid(columnspan=2)
+		self.etiqueta(self.ventana_datos_new_prod, u'Cantidad', 5, 3, grid=True)
+		self.box_amount_np          = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=3, grid=True)
+		self.box_amount_np.grid(columnspan=2)
+		self.etiqueta(self.ventana_datos_new_prod, u'Precio Compra', 5, 4, grid=True)
+		self.box_precio_compra_np   = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=4, grid=True)
+		self.box_precio_compra_np.grid(columnspan=2)
+
+		self.box_amount_np.insert("1.0", 1)
+
+		#---- Radio button
+		lbl_medio_pago = self.etiqueta(self.ventana_datos_new_prod, u'Método de pago', 5, 5, grid=True)
+		self.RB = IntVar()
+		self.RB.set(0)
+		RB0 = Radiobutton(self.ventana_datos_new_prod, text=u'Contado', variable=self.RB, value=0)
+		RB1 = Radiobutton(self.ventana_datos_new_prod, text=u'Crédito', variable=self.RB, value=1)
+
+		RB0.grid(row=5, column=6)
+		RB1.grid(row=5, column=7)
+
+		#--------------------------- consulta proveedores ---------------------
+
+		self.consulta_proveedor_np()
+
+		# Llama el método update_tree para poner los datos de proveedores
+		self.update_tabla_proveedor_np()
+
+		# Click en uno de los registros de la tabla
+		self.tree8.bind("<Double-1>", self.select_proveedor_np)
+
+		# si se escribe algo en la caja, que se actualice la tabla
+		self.box_busca_provee_np.bind("<KeyRelease>", self.check_proveedor_np)
+
+		#--------------------------- sección de los botones -------------------
+
+		self.agrega_boton(self.ventana_datos_new_prod, 'Agregar producto', 6, 11, comando=self.valida_item, pad=(3,3), grid=True).grid(columnspan=2)
+
+		self.final_otra_ventana(self.ventana_datos_new_prod, self.ventana_new_prod) #, wait=True)
+
+	def valida_item(self):
+
+		new_item = self.box_item_np.get(1.0, "end-1c").upper()
+
+		if new_item == '':
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+300+270', u'Notificacion Nuevo Item', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Se requiere el nombre del nuevo item diligenciado', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		elif (new_item in self.nombres_disponibles) == True:
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+300+270', u'Notificacion Nuevo Item', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'El nombre que usted ha ingresado ya existe', 0, 1, grid=True)
+			self.etiqueta(self.notifica, u'Por favor búsquelo en la tabla y presione en el botón "Agregar producto de la tabla"', 0, 2, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+			self.ventana_datos_new_prod.destroy()
+
+		else:
+
+			self.valida_proveedor_new_item()
+
+	def valida_proveedor_new_item(self):
+
+		proveedor           = self.box_provee_np.get(1.0, "end-1c").upper()
+
+		if proveedor == '':
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Se requiere el campo de proveedor diligenciado', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		else:
+
+			available_providers = [pd.lower() for pd in self.proveedores_disponibles]
+
+			self.exist_prov     = proveedor.lower() in available_providers
+
+			if self.exist_prov == True:
+
+				pos                    = np.where(np.array(available_providers) == proveedor.lower())[0][0]
+				self.provider_selected = self.proveedores_disponibles[pos]
+
+				self.minimum_price_new_item()
+
+			else:
+
+				self.provider_selected = proveedor
+
+				self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 4, exitgrid=True, textsalir='Cancelar')
+				self.etiqueta(self.notifica, u'¡¡¡ADVERTENCIA!!!', 0, 0, grid=True)
+				self.etiqueta(self.notifica, u'El proveedor "' + proveedor + '"  no existe en nuestra base de datos.', 0, 1, grid=True)
+				self.etiqueta(self.notifica, u'¿Desea ingresar el producto con este proveedor?', 0, 2, grid=True)
+				self.agrega_boton(self.notifica, 'Continuar', 0, 3, self.minimum_price_new_item, grid=True)
+				self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+	def minimum_price_new_item(self):
+
+		if self.exist_prov == False:
+			self.notifica.destroy()
+
+		#selected = self.tree5.focus()
+		#values   = self.tree5.item(selected, 'values')
+		
+		name     = self.box_item_np.get(1.0, "end-1c").upper()
+		precio   = int(self.box_precio_compra_np.get(1.0, "end-1c"))
+
+		self.precio_minimo_stocks = precio
+
+		self.ventana_min_price = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Precio de venta', 1, 5, 'Cancelar', exitgrid=True)
+		self.etiqueta(self.ventana_min_price, u'Precio mínimo de venta "' + name + '":', 0, 0, grid=True).grid(columnspan=3)
+		self.etiqueta(self.ventana_min_price, u'$ ' + str(self.precio_minimo_stocks)[:10], 1, 1, grid=True, color='red', weight='bold')
+		self.etiqueta(self.ventana_min_price, u'Seleccione un precio de venta', 0, 2, grid=True).grid(columnspan=3)
+		self.box_precio_venta_np = self.caja_texto(self.ventana_min_price, 1.4, 35, 0, 3, grid=True)
+		self.box_precio_venta_np.grid(columnspan=3)
+		self.agrega_boton(self.ventana_min_price, 'Validar', 1, 4, self.agrega_new_item, grid=True)
+		self.final_otra_ventana(self.ventana_min_price, self.ventana_datos_new_prod)
+
+	def agrega_new_item(self):
+
+		#selected      = self.tree5.focus()
+		#values        = self.tree5.item(selected, 'values')
+		
+		code_selected = np.max(self.codes_disponibles) + 1
+		name_selected = self.box_item_np.get(1.0, "end-1c").upper()
+		proveedor     = self.provider_selected # self.box_provee_np.get(1.0, "end-1c")
+		cantidad      = self.box_amount_np.get(1.0, "end-1c")
+		p_compra      = self.box_precio_compra_np.get(1.0, "end-1c")
+		p_venta       = self.box_precio_venta_np.get(1.0, "end-1c")
+		metodo_pago   = ['contado', 'credito'][self.RB.get()]
+		min_price     = int(self.precio_minimo_stocks)
+
+		if cantidad == '' or p_compra == '' or p_venta == '':
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Se requieren todos los campos diligenciados sobre el nuevo producto', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		elif cantidad.isdigit() == False:
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Cantidad con caracteres inválidos. Sólo admite números.', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		elif p_compra.isdigit() == False:
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Precio de compra inválido. Sólo admite números.', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		elif p_venta.isdigit() == False:
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Precio de venta inválido. Sólo admite números.', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		else:
+
+			VALUES            = (code_selected, name_selected, cantidad, p_compra, p_venta, proveedor, metodo_pago, min_price, 1) 
+
+			self.tree6.insert('', END, text='', values=VALUES, iid=self.cont6)
+
+			self.cont6 = self.cont6 + 1
+
+			self.ventana_datos_new_prod.destroy()
+			self.ventana_min_price.destroy()
+
+	def select_new_product(self): #, e):
+
+		if len(self.tree5.selection()[:]) == 0:
+
+			self.notifica = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'No se han seleccionado items de la tabla', 0, 1, grid=True)
+			self.etiqueta(self.notifica, u'Por favor seleccionar producto que va a agregar a la base de datos', 0, 2, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_new_prod)
+
+		elif len(self.tree5.selection()[:]) >= 2:
+
+			self.notifica = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Se seleccionaron más de un item a ser ingresado. Se debe realizar el ingreso uno por uno.', 0, 1, grid=True)
+			self.etiqueta(self.notifica, u'Por favor seleccione un sólo item a ser ingresado', 0, 2, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_new_prod)
+
+		elif len(self.tree5.selection()[:]) == 1:
+
+			self.datos_new_product()
+
+	def datos_new_product(self):
+
+		self.ventana_datos_new_prod = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Información nuevo producto', 2, 10, exitgrid=True)
+
+		#--------------------------------------- seccion de búsqueda del proveedor ---------------------------------------
+
+		selected      = self.tree5.focus()
+		values        = self.tree5.item(selected, 'values')
+		name    = values[1]
+
+		lbl_busca_provee = self.etiqueta(self.ventana_datos_new_prod, u'Buscar Proveedor', 0, 0, grid=True)
+		self.box_busca_provee_np  = self.caja_texto(self.ventana_datos_new_prod, 1.4, 25, locate_x=2, locate_y=0, grid=True)
+
+		self.etiqueta(self.ventana_datos_new_prod, u'Proveedores Históricos', 0, 1, grid=True)#.grid(columnspan=2)
+		self.etiqueta(self.ventana_datos_new_prod, u'Datos requeridos de "' + name +'"', 5, 0, grid=True, color='red').grid(columnspan=4)
+
+		#------------------------------------- Crea las tablas -------------------------------------------
+
+		self.dataCols8 = ('proveedor')
+		self.tree8 = ttk.Treeview(self.ventana_datos_new_prod, columns=self.dataCols8)
+
+		ysb8 = ttk.Scrollbar(self.ventana_datos_new_prod, orient=VERTICAL, command= self.tree8.yview)
+		self.tree8['yscroll'] = ysb8.set
+
+		# setup column headings
+
+		self.tree8.heading('#0',   text='')
+		self.tree8.heading('proveedor', text=u'Proveedor', anchor=W)
+
+		self.tree8.column('#0',   stretch=1, width=0, anchor=W)
+		self.tree8.column('proveedor', stretch=1, width=500, anchor=W)
+
+		# add tree5 and scrollbars to frame
+		self.tree8.grid(row=2, column=0, columnspan=3, rowspan=3, sticky=NSEW, padx=10, pady=10)
+
+		ysb8.grid(row=2, column=3, rowspan=3, sticky=NS, pady=10)
+
+		# set frame resizing priorities
+		self.ventana_datos_new_prod.rowconfigure(0, weight=1)
+		self.ventana_datos_new_prod.columnconfigure(0, weight=1)
+
+		#--------------------------------------- seccion de todos los datos  ---------------------------------------
+
+		self.etiqueta(self.ventana_datos_new_prod, u'Proveedor', 5, 1, grid=True)
+		self.box_provee_np          = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=1, grid=True)
+		self.box_provee_np.grid(columnspan=2)
+		self.etiqueta(self.ventana_datos_new_prod, u'Cantidad', 5, 2, grid=True)
+		self.box_amount_np          = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=2, grid=True)
+		self.box_amount_np.grid(columnspan=2)
+		self.etiqueta(self.ventana_datos_new_prod, u'Precio Compra', 5, 3, grid=True)
+		self.box_precio_compra_np   = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=3, grid=True)
+		self.box_precio_compra_np.grid(columnspan=2)
+
+		self.box_amount_np.insert("1.0", 1)
+
+		#---- Radio button
+		lbl_medio_pago = self.etiqueta(self.ventana_datos_new_prod, u'Método de pago', 5, 4, grid=True)
+		self.RB = IntVar()
+		self.RB.set(0)
+		RB0 = Radiobutton(self.ventana_datos_new_prod, text=u'Contado', variable=self.RB, value=0)
+		RB1 = Radiobutton(self.ventana_datos_new_prod, text=u'Crédito', variable=self.RB, value=1)
+
+		RB0.grid(row=4, column=6)
+		RB1.grid(row=4, column=7)
+
+		#--------------------------- consulta proveedores ---------------------
+
+		self.consulta_proveedor_np()
+
+		# Llama el método update_tree para poner los datos de proveedores
+		self.update_tabla_proveedor_np()
+
+		# Click en uno de los registros de la tabla
+		self.tree8.bind("<Double-1>", self.select_proveedor_np)
+
+		# si se escribe algo en la caja, que se actualice la tabla
+		self.box_busca_provee_np.bind("<KeyRelease>", self.check_proveedor_np)
+
+		#--------------------------- sección de los botones -------------------
+
+		self.agrega_boton(self.ventana_datos_new_prod, 'Agregar producto', 6, 10, comando=self.valida_proveedor, pad=(3,3), grid=True).grid(columnspan=2)
+
+		self.final_otra_ventana(self.ventana_datos_new_prod, self.ventana_new_prod) #, wait=True)
+
+	def valida_proveedor(self):
+
+		proveedor           = self.box_provee_np.get(1.0, "end-1c").upper()
+
+		if proveedor == '':
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Se requiere el campo de proveedor diligenciado', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		else:
+
+			available_providers = [pd.lower() for pd in self.proveedores_disponibles]
+
+			self.exist_prov     = proveedor.lower() in available_providers
+
+			if self.exist_prov == True:
+
+				pos                    = np.where(np.array(available_providers) == proveedor.lower())[0][0]
+				self.provider_selected = self.proveedores_disponibles[pos]
+
+				self.minimum_price_np()
+
+			else:
+
+				self.provider_selected = proveedor
+
+				self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 4, exitgrid=True, textsalir='Cancelar')
+				self.etiqueta(self.notifica, u'¡¡¡ADVERTENCIA!!!', 0, 0, grid=True)
+				self.etiqueta(self.notifica, u'El proveedor "' + proveedor + '"  no existe en nuestra base de datos.', 0, 1, grid=True)
+				self.etiqueta(self.notifica, u'¿Desea ingresar el producto con este proveedor?', 0, 2, grid=True)
+				self.agrega_boton(self.notifica, 'Continuar', 0, 3, self.minimum_price_np, grid=True)
+				self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+	def minimum_price_np(self):
+
+		if self.exist_prov == False:
+			self.notifica.destroy()
+
+		selected      = self.tree5.focus()
+		values        = self.tree5.item(selected, 'values')
+		
+		barcode = int(values[0])
+		name    = values[1]
+		amount  = int(self.box_amount_np.get(1.0, "end-1c"))
+		precio  = int(self.box_precio_compra_np.get(1.0, "end-1c"))
+
+		db_conn    = MySQLdb.connect(host, user, passwd, dbname)
+		db_cursor  = db_conn.cursor()
+		db_cursor.execute("SELECT precio_minimo_venta FROM productos WHERE codigo_barras = " + str(barcode))
+		mp         = db_cursor.fetchall()[0][0]
+		db_conn.close ()
+
+		db_conn    = MySQLdb.connect(host, user, passwd, dbname)
+		db_cursor  = db_conn.cursor()
+		db_cursor.execute("SELECT id FROM stocks WHERE codigo_barras_id = " + str(barcode) + " AND estado = 'En Stock'")
+		disp       = db_cursor.fetchall()
+		db_conn.close ()
+
+		if mp == None:
+			self.precio_minimo_stocks = precio
+		else:
+			self.precio_minimo_stocks = (mp * len(disp) + precio * amount)/(len(disp) + amount)
+
+		self.ventana_min_price = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Precio de venta', 1, 5, 'Cancelar', exitgrid=True)
+		self.etiqueta(self.ventana_min_price, u'Precio mínimo de venta "' + name + '":', 0, 0, grid=True).grid(columnspan=3)
+		self.etiqueta(self.ventana_min_price, u'$ ' + str(self.precio_minimo_stocks)[:10], 1, 1, grid=True, color='red', weight='bold')
+		self.etiqueta(self.ventana_min_price, u'Seleccione un precio de venta', 0, 2, grid=True).grid(columnspan=3)
+		self.box_precio_venta_np = self.caja_texto(self.ventana_min_price, 1.4, 35, 0, 3, grid=True)
+		self.box_precio_venta_np.grid(columnspan=3)
+		self.agrega_boton(self.ventana_min_price, 'Validar', 1, 4, self.agrega_new_product, grid=True)
+		self.final_otra_ventana(self.ventana_min_price, self.ventana_datos_new_prod)
+
+	def agrega_new_product(self):
+
+		selected      = self.tree5.focus()
+		values        = self.tree5.item(selected, 'values')
+		
+		code_selected = int(values[0])
+		name_selected = values[1]
+		proveedor     = self.provider_selected # self.box_provee_np.get(1.0, "end-1c")
+		cantidad      = self.box_amount_np.get(1.0, "end-1c")
+		p_compra      = self.box_precio_compra_np.get(1.0, "end-1c")
+		p_venta       = self.box_precio_venta_np.get(1.0, "end-1c")
+		metodo_pago   = ['contado', 'credito'][self.RB.get()]
+		min_price     = int(self.precio_minimo_stocks)
+
+		if cantidad == '' or p_compra == '' or p_venta == '':
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Se requieren todos los campos diligenciados sobre el nuevo producto', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		elif cantidad.isdigit() == False:
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Cantidad con caracteres inválidos. Sólo admite números.', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		elif p_compra.isdigit() == False:
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Precio de compra inválido. Sólo admite números.', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		elif p_venta.isdigit() == False:
+
+			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
+			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Precio de venta inválido. Sólo admite números.', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
+
+		else:
+
+			VALUES            = (code_selected, name_selected, cantidad, p_compra, p_venta, proveedor, metodo_pago, min_price, 0) 
+
+			self.tree6.insert('', END, text='', values=VALUES, iid=self.cont6)
+
+			self.cont6 = self.cont6 + 1
+
+			self.ventana_datos_new_prod.destroy()
+			self.ventana_min_price.destroy()
+
+	def select_proveedor_np(self, e):
+
+		#----------------------- proveedor seleccionado ------------------------------------------------------
+		selected    = self.tree8.focus()
+		values      = self.tree8.item(selected, 'values')
+		name_provee = values[0]
+
+		#----------------------- pone el nombre del proveedor seleccionado en la caja ------------------------
+		self.box_provee_np.delete('1.0', END)
+		self.box_provee_np.insert("1.0", name_provee)
+
+	def check_proveedor_np(self, e):
+
+		typed = self.box_busca_provee_np.get(1.0, "end-1c")
+
+		if typed == '':
+
+			names_provee = self.proveedores_disponibles
+
+		else:
+
+			names_provee = []
+
+			for i, item in enumerate(self.proveedores_disponibles):
+
+				matched_list          = [character.lower() in item.lower() for character in typed]
+				string_contains_chars = all(matched_list)
+
+				if string_contains_chars == True:
+
+					#print(typed, item)
+
+					names_provee.append(self.proveedores_disponibles[i])
+
+		self.proveedores_disponibles_update = names_provee
+
+		self.update_tabla_proveedor_np()
+
+	def update_tabla_proveedor_np(self):
+
+		### elimina registros de la tabla
+		for record in self.tree8.get_children():
+			self.tree8.delete(record)
+
+		# introduce los datos a la tabla
+		for i in range(len(self.proveedores_disponibles_update)):
+			nombre_provee = self.proveedores_disponibles_update[i]
+			VALUES        = (nombre_provee, '')
+			print(nombre_provee)
+			self.tree8.insert('', END, text='', values=VALUES, iid=i)
+
+	def consulta_proveedor_np(self):
+
+		# ----------------- consulta proveedores en la tabla adquisiciones credito ---------------------
+		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
+		db_cursor  = db_conn.cursor()
+		db_cursor.execute("SELECT proveedor FROM adquisiciones_credito;")
+		list_proveedores1 = db_cursor.fetchall()
+		db_conn.close()
+
+		if len(list_proveedores1) == 0:
+			provee1 = []
+		else:
+			provee1 = [p[0] for p in list_proveedores1]
+
+		# ----------------- consulta proveedores en la tabla stocks ---------------------
+		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
+		db_cursor  = db_conn.cursor()
+		db_cursor.execute("SELECT proveedor FROM stocks WHERE proveedor IS NOT NULL;")
+		list_proveedores2 = db_cursor.fetchall()
+		db_conn.close()
+
+		if len(list_proveedores2) == 0:
+			provee2 = []
+		else:
+			provee2 = [p[0] for p in list_proveedores2]
+
+		#------------------- junta los proveedores de las dos tablas y descarta los repetidos
+		provee = provee1 + provee2
+		provee = list(set(provee))
+
+		self.proveedores_disponibles        = np.array(provee)
+		self.proveedores_disponibles_update = np.array(provee)
+
 	def ingresar_a_la_canasta1(self):
 
 		if len(self.tree6.get_children()) != 0:
-
+			
 			self.ingresar_al_inventario_pn2()
 			self.ingresar_a_la_canasta2()
 
@@ -305,7 +859,8 @@ class Ventas:
 			self.final_otra_ventana(self.notifica, self.ventana_new_prod)
 
 			self.ventana_new_prod.destroy()
-
+			self.consulta()
+			self.update_tree()
 		else:
 
 			self.notifica = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Notificacion Nuevo Producto.', 0, 3, exitgrid=True)
@@ -324,24 +879,37 @@ class Ventas:
 		for record in self.tree6.get_children(): # recorre cada entrada de la tabla 2
 
 			barcode       = str(self.tree6.item(record, 'values')[0])
+			name          =     self.tree6.item(record, 'values')[1]
 			amount        = str(self.tree6.item(record, 'values')[2])
 			precio        = str(self.tree6.item(record, 'values')[3])
-			state         = 'En Stock'
-			provee_bill   = self.tree6.item(record, 'values')[5].upper()
 			costo         = str(self.tree6.item(record, 'values')[4])
-			adquisicion   = self.tree6.item(record, 'values')[6]
+			provee_bill   =     self.tree6.item(record, 'values')[5].upper()
+			adquisicion   =     self.tree6.item(record, 'values')[6]
 			precio_minimo = str(self.tree6.item(record, 'values')[7])
+			new_item      = int(self.tree6.item(record, 'values')[8])
+
+			state         = 'En Stock'
 			code_bill     = 'PR_' + provee_bill + '_' + current_time3
 
-				##### define si la factura existe
+			#### crea el nuevo item si este no existe
 
-			#if adquisicion == 'credito':
+			if new_item == 1:
+				db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
+				db_cursor  = db_conn.cursor()
+				db_cursor.execute("INSERT INTO productos (codigo_barras, nombre_producto, tiene_imei, precio_minimo_venta) VALUES (" + barcode + ", '" + name + "', 0, " + precio_minimo + ");")
+				db_cursor.close()
+				db_conn.commit ()
+				db_conn.close ()
+
+			##### define si la factura existe
 
 			db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
 			db_cursor  = db_conn.cursor()
 			db_cursor.execute("SELECT valor_factura FROM adquisiciones_credito WHERE id_factura_credito = '" + code_bill + "';")
 			existe_bill= db_cursor.fetchall()
 			db_conn.close ()
+
+			#### Actualiza el valor de la factura
 
 			if len(existe_bill) == 0: # la factura NO existe
 				
@@ -369,6 +937,8 @@ class Ventas:
 				db_cursor.close()
 				db_conn.commit ()
 				db_conn.close ()
+
+			#### Inserta los productos
 
 			for i in range(int(amount)):
 				db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
@@ -1473,362 +2043,6 @@ class Ventas:
 				self.tree2.set(record, column = 'subtot', value = int(price_vendido) * cant_vendido)
 
 		self.calcula_canasta()
-
-	def select_new_product(self): #, e):
-
-		if len(self.tree5.selection()[:]) == 0:
-
-			self.notifica = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
-			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'No se han seleccionado items de la tabla', 0, 1, grid=True)
-			self.etiqueta(self.notifica, u'Por favor seleccionar producto que va a agregar a la base de datos', 0, 2, grid=True)
-			self.final_otra_ventana(self.notifica, self.ventana_new_prod)
-
-		elif len(self.tree5.selection()[:]) >= 2:
-
-			self.notifica = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
-			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'Se seleccionaron más de un item a ser ingresado. Se debe realizar el ingreso uno por uno.', 0, 1, grid=True)
-			self.etiqueta(self.notifica, u'Por favor seleccione un sólo item a ser ingresado', 0, 2, grid=True)
-			self.final_otra_ventana(self.notifica, self.ventana_new_prod)
-
-		elif len(self.tree5.selection()[:]) == 1:
-
-			self.datos_new_product()
-
-	def datos_new_product(self):
-
-		self.ventana_datos_new_prod = self.otra_ventana(self.ventana_new_prod, '+300+270', u'Información nuevo producto', 2, 10, exitgrid=True)
-
-		#--------------------------------------- seccion de búsqueda del proveedor ---------------------------------------
-
-		selected      = self.tree5.focus()
-		values        = self.tree5.item(selected, 'values')
-		name    = values[1]
-
-		lbl_busca_provee = self.etiqueta(self.ventana_datos_new_prod, u'Buscar Proveedor', 0, 0, grid=True)
-		#lbl_busca_provee.grid(columnspan=2)
-		self.box_busca_provee_np  = self.caja_texto(self.ventana_datos_new_prod, 1.4, 25, locate_x=2, locate_y=0, grid=True)
-		#self.box_busca_provee_np.grid(columnspan=2)
-
-		#self.etiqueta(self.ventana_datos_new_prod, u'Facturas activas', 0, 1, grid=True)#.grid(columnspan=2)
-		self.etiqueta(self.ventana_datos_new_prod, u'Proveed. Históricos', 0, 1, grid=True)#.grid(columnspan=2)
-		#self.etiqueta(self.ventana_datos_new_prod, u'Artículos factura proveedor seleccionado', 5, 1, grid=True).grid(columnspan=4)
-		self.etiqueta(self.ventana_datos_new_prod, u'Datos requeridos de "' + name +'"', 5, 0, grid=True, color='red').grid(columnspan=4)
-
-		#------------------------------------- Crea las tablas -------------------------------------------
-
-		#self.dataCols7 = ('proveedor')
-		self.dataCols8 = ('proveedor')
-		#self.dataCols9 = ('code', 'name', 'amount', 'precio_compra', 'precio_venta', 'forma_pago')
-		#self.tree7 = ttk.Treeview(self.ventana_datos_new_prod, columns=self.dataCols7)
-		self.tree8 = ttk.Treeview(self.ventana_datos_new_prod, columns=self.dataCols8)
-		#self.tree9 = ttk.Treeview(self.ventana_datos_new_prod, columns=self.dataCols9)
-
-		#ysb7 = ttk.Scrollbar(self.ventana_datos_new_prod, orient=VERTICAL, command= self.tree7.yview)
-		ysb8 = ttk.Scrollbar(self.ventana_datos_new_prod, orient=VERTICAL, command= self.tree8.yview)
-		#ysb9 = ttk.Scrollbar(self.ventana_datos_new_prod, orient=VERTICAL, command= self.tree9.yview)
-		#self.tree7['yscroll'] = ysb7.set
-		self.tree8['yscroll'] = ysb8.set
-		#self.tree9['yscroll'] = ysb9.set
-
-		# setup column headings
-		#self.tree7.heading('#0',   text='')
-		#self.tree7.heading('proveedor', text=u'Proveedor', anchor=W)
-
-		self.tree8.heading('#0',   text='')
-		self.tree8.heading('proveedor', text=u'Proveedor', anchor=W)
-
-		#self.tree9.heading('#0',   text='')
-		#self.tree9.heading('code', text=u'Código', anchor=W)
-		#self.tree9.heading('name', text='Nombre', anchor=W)
-		#self.tree9.heading('amount', text='Cant.', anchor=W)
-		#self.tree9.heading('precio_compra', text='Precio Compra', anchor=W)
-		#self.tree9.heading('precio_venta', text='Precio Venta', anchor=W)
-		#self.tree9.heading('forma_pago', text=u'Método', anchor=W)
-
-		#self.tree7.column('#0',   stretch=1, width=0, anchor=W)
-		#self.tree7.column('proveedor', stretch=1, width=300, anchor=W)
-
-		self.tree8.column('#0',   stretch=1, width=0, anchor=W)
-		#self.tree8.column('cualquier_cosa', stretch=1, width=0, anchor=W)
-		self.tree8.column('proveedor', stretch=1, width=500, anchor=W)
-
-		#self.tree9.column('#0',   stretch=1, width=0, anchor=W)
-		#self.tree9.column('code', stretch=1, width=150, anchor=W)
-		#self.tree9.column('name', stretch=1, width=200, anchor=W)
-		#self.tree9.column('amount', stretch=1, width=70, anchor=W)
-		#self.tree9.column('precio_compra', stretch=1, width=120, anchor=W)
-		#self.tree9.column('precio_venta', stretch=1, width=120, anchor=W)
-		#self.tree9.column('forma_pago', stretch=1, width=100, anchor=W)
-
-		# add tree5 and scrollbars to frame
-		#self.tree7.grid(row=2, column=0, columnspan=1, rowspan=3, sticky=NSEW, padx=10, pady=10)
-		self.tree8.grid(row=2, column=0, columnspan=3, rowspan=3, sticky=NSEW, padx=10, pady=10)
-		#self.tree9.grid(row=2, column=5, columnspan=3, rowspan=3, sticky=NSEW, padx=10, pady=10)
-
-		#ysb7.grid(row=2, column=1, rowspan=3, sticky=NS, pady=10)
-		ysb8.grid(row=2, column=3, rowspan=3, sticky=NS, pady=10)
-		#ysb9.grid(row=2, column=9, rowspan=3, sticky=NS, pady=10)
-
-		# set frame resizing priorities
-		self.ventana_new_prod.rowconfigure(0, weight=1)
-		self.ventana_new_prod.columnconfigure(0, weight=1)
-
-		#--------------------------------------- seccion de todos los datos  ---------------------------------------
-
-		self.etiqueta(self.ventana_datos_new_prod, u'Proveedor', 5, 1, grid=True)
-		self.box_provee_np          = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=1, grid=True)
-		self.box_provee_np.grid(columnspan=2)
-		self.etiqueta(self.ventana_datos_new_prod, u'Cantidad', 5, 2, grid=True)
-		self.box_amount_np          = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=2, grid=True)
-		self.box_amount_np.grid(columnspan=2)
-		self.etiqueta(self.ventana_datos_new_prod, u'Precio Compra', 5, 3, grid=True)
-		self.box_precio_compra_np   = self.caja_texto(self.ventana_datos_new_prod, 1.4, 30, locate_x=6, locate_y=3, grid=True)
-		self.box_precio_compra_np.grid(columnspan=2)
-		self.etiqueta(self.ventana_datos_new_prod, u'Precio Venta', 5, 4, grid=True)
-
-		self.box_amount_np.insert("1.0", 1)
-
-		#---- Radio button
-		lbl_medio_pago = self.etiqueta(self.ventana_datos_new_prod, u'Método de pago', 5, 4, grid=True)
-		self.RB = IntVar()
-		self.RB.set(0)
-		RB0 = Radiobutton(self.ventana_datos_new_prod, text=u'Contado', variable=self.RB, value=0)
-		RB1 = Radiobutton(self.ventana_datos_new_prod, text=u'Crédito', variable=self.RB, value=1)
-
-		RB0.grid(row=4, column=6)
-		RB1.grid(row=4, column=7)
-
-		#--------------------------- consulta proveedores ---------------------
-
-		self.consulta_proveedor_np()
-
-		# Llama el método update_tree para poner los datos de proveedores
-		self.update_tabla_proveedor_np()
-
-		# Click en uno de los registros de la tabla
-		self.tree8.bind("<Double-1>", self.select_proveedor_np)
-
-		# si se escribe algo en la caja, que se actualice la tabla
-		self.box_busca_provee_np.bind("<KeyRelease>", self.check_proveedor_np)
-
-		#--------------------------- sección de los botones -------------------
-
-		self.agrega_boton(self.ventana_datos_new_prod, 'Agregar producto', 6, 10, comando=self.valida_proveedor, pad=(3,3), grid=True).grid(columnspan=2)
-
-		self.final_otra_ventana(self.ventana_datos_new_prod, self.ventana_new_prod) #, wait=True)
-
-	def valida_proveedor(self):
-
-		proveedor           = self.box_provee_np.get(1.0, "end-1c").upper()
-
-		if proveedor == '':
-
-			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
-			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'Se requiere el campo de proveedor diligenciado', 0, 1, grid=True)
-			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
-
-		else:
-
-			available_providers = [pd.lower() for pd in self.proveedores_disponibles]
-
-			self.exist_prov     = proveedor.lower() in available_providers
-
-			if self.exist_prov == True:
-
-				pos                    = np.where(np.array(available_providers) == proveedor.lower())[0][0]
-				self.provider_selected = self.proveedores_disponibles[pos]
-
-				self.minimum_price_np()
-
-			else:
-
-				self.provider_selected = proveedor
-
-				self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 4, exitgrid=True, textsalir='Cancelar')
-				self.etiqueta(self.notifica, u'¡¡¡ADVERTENCIA!!!', 0, 0, grid=True)
-				self.etiqueta(self.notifica, u'El proveedor "' + proveedor + '"  no existe en nuestra base de datos.', 0, 1, grid=True)
-				self.etiqueta(self.notifica, u'¿Desea ingresar el producto con este proveedor?', 0, 2, grid=True)
-				self.agrega_boton(self.notifica, 'Continuar', 0, 3, self.minimum_price_np, grid=True)
-				self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
-
-	def minimum_price_np(self):
-
-		if self.exist_prov == False:
-			self.notifica.destroy()
-
-		selected      = self.tree5.focus()
-		values        = self.tree5.item(selected, 'values')
-		
-		barcode = int(values[0])
-		name    = values[1]
-		amount  = int(self.box_amount_np.get(1.0, "end-1c"))
-		precio  = int(self.box_precio_compra_np.get(1.0, "end-1c"))
-
-		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-		db_cursor  = db_conn.cursor()
-		db_cursor.execute("SELECT precio_minimo_venta FROM productos WHERE codigo_barras = " + str(barcode))
-		mp         = db_cursor.fetchall()[0][0]
-		db_conn.close ()
-
-		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-		db_cursor  = db_conn.cursor()
-		db_cursor.execute("SELECT id FROM stocks WHERE codigo_barras_id = " + str(barcode) + " AND estado = 'En Stock'")
-		disp       = db_cursor.fetchall()
-		db_conn.close ()
-
-		if mp == None:
-			self.precio_minimo_stocks = precio
-		else:
-			self.precio_minimo_stocks = (mp * len(disp) + precio * amount)/(len(disp) + amount)
-
-		self.ventana_min_price = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Precio de venta', 1, 5, 'Cancelar', exitgrid=True)
-		self.etiqueta(self.ventana_min_price, u'Precio mínimo de venta "' + name + '":', 0, 0, grid=True).grid(columnspan=3)
-		self.etiqueta(self.ventana_min_price, u'$ ' + str(self.precio_minimo_stocks)[:10], 1, 1, grid=True, color='red', weight='bold')
-		self.etiqueta(self.ventana_min_price, u'Seleccione un precio de venta', 0, 2, grid=True).grid(columnspan=3)
-		self.box_precio_venta_np = self.caja_texto(self.ventana_min_price, 1.4, 35, 0, 3, grid=True)
-		self.box_precio_venta_np.grid(columnspan=3)
-		self.agrega_boton(self.ventana_min_price, 'Validar', 1, 4, self.agrega_new_product, grid=True)
-		self.final_otra_ventana(self.ventana_min_price, self.ventana_datos_new_prod)
-
-	def agrega_new_product(self):
-
-		selected      = self.tree5.focus()
-		values        = self.tree5.item(selected, 'values')
-		
-		code_selected = int(values[0])
-		name_selected = values[1]
-		proveedor     = self.provider_selected # self.box_provee_np.get(1.0, "end-1c")
-		cantidad      = self.box_amount_np.get(1.0, "end-1c")
-		p_compra      = self.box_precio_compra_np.get(1.0, "end-1c")
-		p_venta       = self.box_precio_venta_np.get(1.0, "end-1c")
-		metodo_pago   = ['contado', 'credito'][self.RB.get()]
-		min_price     = int(self.precio_minimo_stocks)
-
-		if cantidad == '' or p_compra == '' or p_venta == '':
-
-			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
-			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'Se requieren todos los campos diligenciados sobre el nuevo producto', 0, 1, grid=True)
-			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
-
-		elif cantidad.isdigit() == False:
-
-			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
-			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'Cantidad con caracteres inválidos. Sólo admite números.', 0, 1, grid=True)
-			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
-
-		elif p_compra.isdigit() == False:
-
-			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
-			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'Precio de compra inválido. Sólo admite números.', 0, 1, grid=True)
-			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
-
-		elif p_venta.isdigit() == False:
-
-			self.notifica = self.otra_ventana(self.ventana_datos_new_prod, '+350+320', u'Notificacion Nuevo Producto', 0, 3, exitgrid=True)
-			self.etiqueta(self.notifica, u'¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'Precio de venta inválido. Sólo admite números.', 0, 1, grid=True)
-			self.final_otra_ventana(self.notifica, self.ventana_datos_new_prod)
-
-		else:
-
-			VALUES            = (code_selected, name_selected, cantidad, p_compra, p_venta, proveedor, metodo_pago, min_price) 
-
-			self.tree6.insert('', END, text='', values=VALUES, iid=self.cont6)
-
-			self.cont6 = self.cont6 + 1
-
-			self.ventana_datos_new_prod.destroy()
-			self.ventana_min_price.destroy()
-
-	def select_proveedor_np(self, e):
-
-		#----------------------- proveedor seleccionado ------------------------------------------------------
-		selected    = self.tree8.focus()
-		values      = self.tree8.item(selected, 'values')
-		name_provee = values[0]
-
-		#----------------------- pone el nombre del proveedor seleccionado en la caja ------------------------
-		self.box_provee_np.delete('1.0', END)
-		self.box_provee_np.insert("1.0", name_provee)
-
-	def check_proveedor_np(self, e):
-
-		typed = self.box_busca_provee_np.get(1.0, "end-1c")
-
-		if typed == '':
-
-			names_provee = self.proveedores_disponibles
-
-		else:
-
-			names_provee = []
-
-			for i, item in enumerate(self.proveedores_disponibles):
-
-				matched_list          = [character.lower() in item.lower() for character in typed]
-				string_contains_chars = all(matched_list)
-
-				if string_contains_chars == True:
-
-					#print(typed, item)
-
-					names_provee.append(self.proveedores_disponibles[i])
-
-		self.proveedores_disponibles_update = names_provee
-
-		self.update_tabla_proveedor_np()
-
-	def update_tabla_proveedor_np(self):
-
-		### elimina registros de la tabla
-		for record in self.tree8.get_children():
-			self.tree8.delete(record)
-
-		# introduce los datos a la tabla
-		for i in range(len(self.proveedores_disponibles_update)):
-			nombre_provee = self.proveedores_disponibles_update[i]
-			VALUES        = (nombre_provee)
-			#print(nombre_provee)
-			self.tree8.insert('', END, text='', values=VALUES, iid=i)
-
-	def consulta_proveedor_np(self):
-
-		# ----------------- consulta proveedores en la tabla adquisiciones credito ---------------------
-		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-		db_cursor  = db_conn.cursor()
-		db_cursor.execute("SELECT proveedor FROM adquisiciones_credito;")
-		list_proveedores1 = db_cursor.fetchall()
-		db_conn.close()
-
-		if len(list_proveedores1) == 0:
-			provee1 = []
-		else:
-			provee1 = [p[0] for p in list_proveedores1]
-
-		# ----------------- consulta proveedores en la tabla stocks ---------------------
-		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-		db_cursor  = db_conn.cursor()
-		db_cursor.execute("SELECT proveedor FROM stocks WHERE proveedor IS NOT NULL;")
-		list_proveedores2 = db_cursor.fetchall()
-		db_conn.close()
-
-		if len(list_proveedores2) == 0:
-			provee2 = []
-		else:
-			provee2 = [p[0] for p in list_proveedores2]
-
-		#------------------- junta los proveedores de las dos tablas y descarta los repetidos
-		provee = provee1 + provee2
-		provee = list(set(provee))
-
-		self.proveedores_disponibles        = np.array(provee)
-		self.proveedores_disponibles_update = np.array(provee)
 
 	def calcula_canasta(self):
 
