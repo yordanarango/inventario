@@ -24,15 +24,15 @@ class Stock:
 
 
 	#---------------------------------------------------------------------------------------------
-	#-------------------------------- Ventana de opciones de items -------------------------------
+	#-------------------------------- Ventana de opciones de facturas -------------------------------
 	#---------------------------------------------------------------------------------------------
 
 	def facturas(self):
 
-		self.ventana_prod = self.otra_ventana(self.ventana_stock, '+200+170', 'Opciones Facturas', 1, 2, exitgrid=True)
+		self.ventana_prod = self.otra_ventana(self.ventana_stock, '+200+170', 'Opciones Facturas', 0, 2, exitgrid=True)
 		self.agrega_boton(self.ventana_prod, u'Generar Factura', 0, 0,  grid=True)#self.genera_factura
-		self.agrega_boton(self.ventana_prod, u'Pagar Factura'  , 2, 0, grid=True)# self.pagar_factura
-		self.agrega_boton(self.ventana_prod, u'Buscar Factura' , 1, 1,  grid=True)#self.buscar_factura
+		self.agrega_boton(self.ventana_prod, u'Pagar Factura'  , 0, 1, grid=True)# self.pagar_factura
+		self.agrega_boton(self.ventana_prod, u'Buscar Factura' , 0, 1,  grid=True)#self.buscar_factura
 		self.final_otra_ventana(self.ventana_prod, self.ventana_stock)
 
 	#---------------------------------------------------------------------------------------------
@@ -89,15 +89,15 @@ class Stock:
 		if barcode == '' or nombre_prod == '':
 
 			# ventana de notificacion de que el código de barras o el nombre no fue escrito
-			self.notifica_new_product = self.otra_ventana(self.ventana_alimbd, '600x100+300+270', u'Notificacion nuevo producto', 180, 65)
+			self.notifica_new_product = self.otra_ventana(self.ventana_alimbd, '500x100+300+270', u'Notificacion nuevo producto', 180, 65)
 			self.etiqueta(self.notifica_new_product, u'Código de barras y Nombre deben ser escritos', 45, 20)
 			self.final_otra_ventana(self.notifica_new_product, self.ventana_alimbd)
 
 		elif barcode.isdigit() == False:
 
 			# ventana de notificacion de que el código de barras tiene caracteres alfabéticos o caracteres especiales
-			self.notifica_new_product = self.otra_ventana(self.ventana_alimbd, '900x100+300+270', u'Notificacion nuevo producto', 400, 65)
-			self.etiqueta(self.notifica_new_product, u'Código de barras con caracteres no válidos. Sólo admite números. ¡Corregir!', 1, 20)
+			self.notifica_new_product = self.otra_ventana(self.ventana_alimbd, '550x100+300+270', u'Notificacion nuevo producto', 250, 65)
+			self.etiqueta(self.notifica_new_product, u'Código de barras con caracteres no válidos. Corregir', 45, 20)
 			self.final_otra_ventana(self.notifica_new_product, self.ventana_alimbd)
 
 		else:
@@ -113,7 +113,7 @@ class Stock:
 				db_conn.close ()
 
 				# ventana de notificacion de que el nuevo producto ha sido introducido exitosamente a la base de datos
-				self.notifica_new_product = self.otra_ventana(self.ventana_alimbd, '600x100+300+270', u'Notificacion nuevo producto', 180, 65)
+				self.notifica_new_product = self.otra_ventana(self.ventana_alimbd, '450x100+300+270', u'Notificacion nuevo producto', 180, 65)
 				self.etiqueta(self.notifica_new_product, 'Nuevo item registrado exitosamente', 45, 20)
 				self.final_otra_ventana(self.notifica_new_product, self.ventana_alimbd)
 
@@ -528,7 +528,7 @@ class Stock:
 
 		self.ventana_cred_cont.destroy()
 
-		self.ventana_alimstock = self.otra_ventana(self.ventana_exist, '+250+220', u'Alimentar Factura', 4, 20, 'Cancelar', exitgrid=True)
+		self.ventana_alimstock = self.otra_ventana(self.ventana_exist, '+250+220', u'Alimentar Factura', 4, 18, 'Cancelar', exitgrid=True)
 
 		#------------------------------------- Crea las cajas de texto para la factura -----------------------------------------------
 
@@ -545,43 +545,29 @@ class Stock:
 		self.codigo_factura = self.caja_texto(self.ventana_alimstock, 1.4, 25, 1, 3, grid=True)
 		self.codigo_factura.grid(columnspan=2)
 
-		#------------------------------------------- Radio button --------------------------------------------------------
-		self.etiqueta(self.ventana_alimstock, u'Método de pago', 0, 5, grid=True)
-		self.RB = IntVar()
-		self.RB.set(1)
-		RB0 = Radiobutton(self.ventana_alimstock, text=u'Contado', variable=self.RB, value=0)
-		RB1 = Radiobutton(self.ventana_alimstock, text=u'Crédito', variable=self.RB, value=1)
-
-		RB0.grid(row=5, column=1)
-		RB1.grid(row=6, column=1)
-
 		#------------------------------------- Crea las cajas de texto para la alimentar las existencias -----------------------------------------------
 
-		self.name_new_product = ''
-
-		self.etiqueta(self.ventana_alimstock, u'Nombre Producto', 5, 1, grid=True)
-		self.lbl_name_products = self.etiqueta(self.ventana_alimstock, self.name_new_product, 6, 1, grid=True, color='red')
-		self.lbl_name_products.grid(columnspan=2)
-		#self.codigo_stock = self.caja_texto(self.ventana_alimstock, 1.4, 25, 6, 1, grid=True)
-		#self.codigo_stock.grid(columnspan=2)
-		self.etiqueta(self.ventana_alimstock, u'Valor de compra/unidad', 5, 2, grid=True)
-		self.valor_compra_stock = self.caja_texto(self.ventana_alimstock, 1.4, 25, 6, 2, grid=True)
+		self.etiqueta(self.ventana_alimstock, u'Cód. Barras', 5, 0, grid=True)
+		self.codigo_stock = self.caja_texto(self.ventana_alimstock, 1.4, 25, 6, 0, grid=True)
+		self.codigo_stock.grid(columnspan=2)
+		self.etiqueta(self.ventana_alimstock, u'Valor de compra/unidad', 5, 1, grid=True)
+		self.valor_compra_stock = self.caja_texto(self.ventana_alimstock, 1.4, 25, 6, 1, grid=True)
 		self.valor_compra_stock.grid(columnspan=2)
-		self.etiqueta(self.ventana_alimstock, u'Cantidad', 5, 3, grid=True)
-		self.cantidad_entra_stock = self.caja_texto(self.ventana_alimstock, 1.4, 25, 6, 3, grid=True)
+		self.etiqueta(self.ventana_alimstock, u'Cantidad', 5, 2, grid=True)
+		self.cantidad_entra_stock = self.caja_texto(self.ventana_alimstock, 1.4, 25, 6, 2, grid=True)
 		self.cantidad_entra_stock.grid(columnspan=2)
 
 		self.conteo = 0
 
 		#------------------------------------- Crea las caja para el total -----------------------------------------------
 
-		self.etiqueta(self.ventana_alimstock, u'Total', 6, 17, grid=True)
-		self.box_total = self.caja_texto(self.ventana_alimstock, 1.4, 25, 7, 17, grid=True)
-
+		self.etiqueta(self.ventana_alimstock, u'Total', 6, 15, grid=True)
+		self.box_total = self.caja_texto(self.ventana_alimstock, 1.4, 25, 7, 15, grid=True)
+		#self.codigo_stock.grid(columnspan=2)
 
 		#------------------------------------- Crea la tabla de proveedores -------------------------------------------
-		dataCols  = ('name_proveedor', 'cualquier_cosa')
-		dataCols2 = ('name_prod', 'cod_barras', 'valor_compra', 'cantidad', 'precio_venta', 'subtotal', 'precio_min')
+		dataCols  = ('name_proveedor')
+		dataCols2 = ('name_prod', 'cod_barras', 'valor_compra', 'cantidad', 'precio_venta', 'subtotal')
 
 		self.tree = ttk.Treeview(self.ventana_alimstock, columns=dataCols)
 		self.tree2= ttk.Treeview(self.ventana_alimstock, columns=dataCols2)
@@ -595,7 +581,6 @@ class Stock:
 		# setup column headings
 		self.tree.heading('#0',   text='')
 		self.tree.heading('name_proveedor', text='Nombre Proveedor', anchor=W)
-		self.tree.heading('cualquier_cosa', text='', anchor=W)
 
 		self.tree2.heading('#0',   text='')
 		self.tree2.heading('name_prod', text='Producto', anchor=W)
@@ -604,36 +589,33 @@ class Stock:
 		self.tree2.heading('cantidad', text='Cantidad', anchor=W)
 		self.tree2.heading('precio_venta', text='Precio venta', anchor=W)
 		self.tree2.heading('subtotal', text='Subtotal', anchor=W)
-		self.tree2.heading('precio_min', text='P. Min. Venta', anchor=W)
 
 		self.tree.column('#0'            , stretch=1, width=0, anchor=W)
 		self.tree.column('name_proveedor', stretch=1, width=600, anchor=W)
-		self.tree.column('cualquier_cosa', stretch=1, width=0, anchor=W)
 
 		self.tree2.column('#0'          , stretch=1, width=0, anchor=W)
-		self.tree2.column('name_prod'   , stretch=1, width=200, anchor=W)
+		self.tree2.column('name_prod'  , stretch=1, width=200, anchor=W)
 		self.tree2.column('cod_barras'  , stretch=1, width=180, anchor=W)
 		self.tree2.column('valor_compra', stretch=1, width=180, anchor=W)
 		self.tree2.column('cantidad'    , stretch=1, width=80, anchor=W)
 		self.tree2.column('precio_venta', stretch=1, width=150, anchor=W)
 		self.tree2.column('subtotal'    , stretch=1, width=120, anchor=W)
-		self.tree2.column('precio_min'  , stretch=1, width=120, anchor=W)
 
 
 		# add tree and scrollbars to frame
-		self.tree.grid(row=7, column=0, columnspan=3, rowspan=10, sticky=NSEW, padx=10, pady=10)
-		self.tree2.grid(row=5, column=5, columnspan=3, rowspan=12, sticky=NSEW, padx=10, pady=10)
+		self.tree.grid(row=5, column=0, columnspan=3, rowspan=10, sticky=NSEW, padx=10, pady=10)
+		self.tree2.grid(row=5, column=5, columnspan=3, rowspan=10, sticky=NSEW, padx=10, pady=10)
 
-		ysb.grid(row=7, column=3, rowspan=10, sticky=NS, pady=10)
-		ysb2.grid(row=5, column=8, rowspan=12, sticky=NS, pady=10)
+		ysb.grid(row=5, column=3, rowspan=10, sticky=NS, pady=10)
+		ysb2.grid(row=5, column=8, rowspan=10, sticky=NS, pady=10)
 
 		#lineas separadoras
 		linea_separ1 = ttk.Separator(self.ventana_alimstock, orient=VERTICAL)
-		linea_separ1.grid(row=0, column=4, rowspan=18, sticky=NS, padx=10, pady=10)
-		#linea_separ2 = ttk.Separator(self.ventana_alimstock, orient=HORIZONTAL)
-		#linea_separ2.grid(row=4, column=5, columnspan=3, sticky=EW, padx=10, pady=30)
+		linea_separ1.grid(row=0, column=4, rowspan=16, sticky=NS, padx=10, pady=10)
+		linea_separ2 = ttk.Separator(self.ventana_alimstock, orient=HORIZONTAL)
+		linea_separ2.grid(row=4, column=5, columnspan=3, sticky=EW, padx=10, pady=30)
 		linea_separ3 = ttk.Separator(self.ventana_alimstock, orient=HORIZONTAL)
-		linea_separ3.grid(row=18, column=0, columnspan=8, sticky=EW, padx=10, pady=30)
+		linea_separ3.grid(row=16, column=0, columnspan=8, sticky=EW, padx=10, pady=30)
 
 		# set frame resizing priorities
 		self.ventana_alimstock.rowconfigure(0, weight=1)
@@ -654,247 +636,17 @@ class Stock:
 
 		#------------------------------------ botones ------------------------------
 
-		self.agrega_boton(self.ventana_alimstock, 'Ingresar Factura', 4, 19, self.verifica_factura, pad=(3,3), grid=True) 
-		boton_borra_datos_factura = self.agrega_boton(self.ventana_alimstock, 'Borrar Datos Factura', 0, 17, self.delete_factura, pad=(3,3), grid=True)
+		self.agrega_boton(self.ventana_alimstock, 'Ingresar Factura', 4, 17, self.verifica_factura, pad=(3,3), grid=True) 
+		boton_borra_datos_factura = self.agrega_boton(self.ventana_alimstock, 'Borrar Datos Factura', 0, 15, self.delete_factura, pad=(3,3), grid=True)
 		boton_borra_datos_factura.grid(columnspan=3)
-		boton_codigo_aleatorio    = self.agrega_boton(self.ventana_alimstock, 'Generar Código de Factura', 1, 4, self.generar_codigo_factura, pad=(3,3), grid=True)
+		boton_codigo_aleatorio = self.agrega_boton(self.ventana_alimstock, 'Generar Código de Factura', 1, 4, self.generar_codigo_factura, pad=(3,3), grid=True)
 		boton_codigo_aleatorio.grid(columnspan=2)
-		boton_nombre_db           = self.agrega_boton(self.ventana_alimstock, 'Nombre existente', 5, 0, self.nombres_existentes, pad=(3,3), grid=True)
-		boton_nombre_nuevo        = self.agrega_boton(self.ventana_alimstock, 'Nombre nuevo', 6, 0, self.nombre_nuevo, pad=(3,3), grid=True)
-		boton_nombre_nuevo.grid(columnspan=2)
-		boton_agrega_prod         = self.agrega_boton(self.ventana_alimstock, 'Agregar producto', 6, 4, self.agrega_producto, pad=(3,3), grid=True)
+		boton_agrega_prod = self.agrega_boton(self.ventana_alimstock, 'Agregar producto', 6, 3, self.agrega_producto, pad=(3,3), grid=True)
 		boton_agrega_prod.grid(columnspan=2)
-		self.agrega_boton(self.ventana_alimstock, 'Borrar escrito', 5, 4, self.delete_productos_factura, pad=(3,3), grid=True)
-		self.agrega_boton(self.ventana_alimstock, 'Quitar producto', 5, 17, self.quitar_productos, pad=(3,3), grid=True)
+		self.agrega_boton(self.ventana_alimstock, 'Borrar escrito', 5, 3, self.delete_productos_factura, pad=(3,3), grid=True)
+		self.agrega_boton(self.ventana_alimstock, 'Quitar producto', 5, 15, self.quitar_productos, pad=(3,3), grid=True)
 
 		self.final_otra_ventana(self.ventana_alimstock, self.ventana_exist)
-
-	def nombres_existentes(self):
-
-		self.ventana_nombre_db = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Ventana Nombre Existente', 1, 16, exitgrid=True)
-
-		#------------------------------------- Buscador de productos existentes -------------------------------------
-		lbl_search_prod      = self.etiqueta(self.ventana_nombre_db, 'Buscar producto', locate_x=0, locate_y=0, grid=True)
-		self.busca_prod_box  = self.caja_texto(self.ventana_nombre_db, 1.4, 40, locate_x=1, locate_y=0, grid=True)
-
-		#------------------------------------- Crea las tablas -------------------------------------------
-
-		self.dataCols5 = ('code', 'name')
-		self.tree10 = ttk.Treeview(self.ventana_nombre_db, columns=self.dataCols5)
-
-		ysb5 = ttk.Scrollbar(self.ventana_nombre_db, orient=VERTICAL, command= self.tree10.yview)
-		self.tree10['yscroll'] = ysb5.set
-
-		# setup column headings
-		self.tree10.heading('#0',   text='')
-		self.tree10.heading('code', text=u'Código', anchor=W)
-		self.tree10.heading('name', text='Nombre', anchor=W)
-
-		self.tree10.column('#0',   stretch=1, width=0, anchor=W)
-		self.tree10.column('code', stretch=1, width=200, anchor=W)
-		self.tree10.column('name', stretch=1, width=350, anchor=W)
-
-		# add tree10 and scrollbars to frame
-		self.tree10.grid(row=1, column=0, columnspan=2, rowspan=5, sticky=NSEW, padx=10, pady=10)
-
-		ysb5.grid(row=1, column=2, rowspan=5, sticky=NS, pady=10)
-
-		# set frame resizing priorities
-		self.ventana_nombre_db.rowconfigure(0, weight=1)
-		self.ventana_nombre_db.columnconfigure(0, weight=1)
-
-		#------------------ consulta2 nombres y codigos de barra y los pone en la tabla de disponibles --------------------------
-
-		self.cont6 = 0
-
-		self.consulta_stocks()
-
-		# Llama el método update_tree para poner los datos iniciales
-		self.update_tree_stocks()
-
-		# Click en uno de los registros de la tabla
-		self.tree10.bind("<Double-1>", self.select_new_name_db)
-
-		# si se escribe algo en la caja, que se actualice la tabla
-		self.busca_prod_box.bind("<KeyRelease>", self.check_tree_stocks)
-
-		self.final_otra_ventana(self.ventana_nombre_db, self.ventana_alimstock)
-
-	def select_new_name_db(self, e):
-
-		self.bool_exist_new_name = True
-
-		# agregar a la caja lo que se seleccionó
-		selected      = self.tree10.focus()
-
-		values        = self.tree10.item(selected, 'values')
-
-		code_selected = int(values[0])
-		name_selected = values[1]
-
-		self.name_new_product = name_selected
-		self.code_new_product = code_selected
-
-		self.lbl_name_products.configure(text=self.name_new_product, foreground='red')
-
-		self.ventana_nombre_db.destroy()
-
-	def nombre_nuevo(self):
-
-		self.ventana_nombre_new = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Ventana Nuevo Nombre', 1, 1, exitgrid=True)
-
-		lbl_write_prod       = self.etiqueta(self.ventana_nombre_new, 'Nombre nuevo producto', locate_x=0, locate_y=0, grid=True)
-		self.write_prod_box  = self.caja_texto(self.ventana_nombre_new, 1.4, 40, locate_x=1, locate_y=0, grid=True)
-
-		boton_agrega_prod    = self.agrega_boton(self.ventana_nombre_new, 'Agregar nombre', 0, 1, self.verifica_nombre_new, pad=(3,3), grid=True)
-
-		self.final_otra_ventana(self.ventana_nombre_new, self.ventana_alimstock)
-
-	def verifica_nombre_new(self):
-
-		self.name_new_product = self.write_prod_box.get(1.0, "end-1c").upper()
-
-		if self.name_new_product == '':
-
-			self.notifica_name_vacio = self.otra_ventana(self.ventana_nombre_new, '+300+270', u'Notificación Existencias', 0, 2, exitgrid=True)
-			self.etiqueta(self.notifica_name_vacio, u'!!!No se ha escrito aún un nombre!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica_name_vacio, 'Por favor escriba el nombre del nuevo producto a ingresar', 0, 1, grid=True)
-			self.final_otra_ventana(self.notifica_name_vacio, self.ventana_nombre_new)
-		
-		else:
-
-			self.consulta_stocks()
-
-			if (self.name_new_product in self.nombres_disponibles) == True:
-
-				self.code_new_product    = self.codes_disponibles[self.nombres_disponibles == self.name_new_product][0]
-
-				self.bool_exist_new_name = True
-
-				self.notifica_name_vacio = self.otra_ventana(self.ventana_nombre_new, '+350+320', u'Notificación Existencias', 1, 2, exitgrid=True, textsalir='Corregir nombre')
-				self.etiqueta(self.notifica_name_vacio, u'!!!El nombre "' + self.name_new_product + '" ya existe en la base de datos!!!', 0, 0, grid=True).grid(columnspan=2)
-				self.etiqueta(self.notifica_name_vacio, '¿Qué desea hacer?', 0, 1, grid=True).grid(columnspan=2)
-				self.agrega_boton(self.notifica_name_vacio, 'Agregar de todos modos', 0, 2, self.agrega_nombre_new, pad=(3,3), grid=True)
-				self.final_otra_ventana(self.notifica_name_vacio, self.ventana_nombre_new)
-
-			else:
-
-				self.bool_exist_new_name = False
-
-				self.agrega_nombre_new()
-
-	def agrega_nombre_new(self):
-
-		if self.bool_exist_new_name == True:
-
-			self.notifica_name_vacio.destroy()
-
-		self.lbl_name_products.configure(text=self.name_new_product, foreground='red')
-
-		self.ventana_nombre_new.destroy()
-
-	def consulta_stocks(self):
-
-		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-		db_cursor  = db_conn.cursor()
-		db_cursor.execute("SELECT nombre_producto, codigo_barras, tiene_imei FROM productos;")
-		list_items = db_cursor.fetchall()
-		db_conn.close()
-
-		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-		db_cursor  = db_conn.cursor()
-		db_cursor.execute("SELECT productos.codigo_barras, stocks.precio_venta, stocks.IMEI FROM stocks INNER JOIN productos ON productos.codigo_barras = stocks.codigo_barras_id WHERE stocks.estado = 'En Stock';")
-		list_number = db_cursor.fetchall()
-		db_conn.close ()
-
-		self.nombres_disponibles  = np.array([NN[0] for NN in list_items]) # nombres
-		codigos_disponibles       = [NN[1] for NN in list_items] #codigos
-		prod_disponibles          = np.array([NN[0] for NN in list_number]) #codigos existentes
-		precios                   = np.array([NN[1] for NN in list_number]) # precios de los códigos existentes
-		self.imeis                = np.array([NN[2] for NN in list_number]) # imei de los productos. Si el producto no es un celular, es nan
-		
-		self.cantidad_disponible  = np.array([len(prod_disponibles[prod_disponibles == NN]) for NN in codigos_disponibles]) #cantidad existente de cada producto
-		#self.bool_imei            = np.array([np.any(self.imeis[prod_disponibles == NN] != None) for NN in codigos_disponibles]) # esta variable me dice si algún producto con este código de barras necesita IMEI. Si es True significa que cualquier producto con dicho código debería necesitar un IMEI
-		self.bool_imei            = np.array([NN[2] for NN in list_items])
-
-		prices  = [] #precio de los productos existentes
-
-		for NN in codigos_disponibles:
-			if len(precios[prod_disponibles == NN]) >= 1:
-				prices.append(precios[prod_disponibles == NN][0])
-			else:
-				prices.append(np.nan)
-
-		self.codes_disponibles   = np.array(np.copy(codigos_disponibles))
-		self.precios_disponibles = np.array(np.copy(prices))
-
-		self.codes_disponibles_update   = self.codes_disponibles
-		self.nombres_disponibles_update = self.nombres_disponibles
-		self.cantidad_disponible_update = self.cantidad_disponible
-
-	def update_tree_stocks(self):
-
-		### elimina registros de la tabla
-
-		for record in self.tree10.get_children():
-			self.tree10.delete(record)
-
-		# introduce los datos a la tabla
-		for i in range(len(self.nombres_disponibles_update)):
-
-			codigo_barras = self.codes_disponibles_update[i]
-			nombre_produc = self.nombres_disponibles_update[i]
-			cant_disp     = self.cantidad_disponible_update[i]
-
-			VALUES        = (codigo_barras, nombre_produc, cant_disp) 
-
-			self.tree10.insert('', END, text='', values=VALUES, iid=i)
-
-	def check_tree_stocks(self, e):
-
-		typed = self.busca_prod_box.get(1.0, "end-1c")
-
-		#self.consulta()
-
-		if typed == '':
-
-			names = self.nombres_disponibles
-			codes = self.codes_disponibles
-			cant  = self.cantidad_disponible
-
-		elif typed.isdigit() == False:
-
-			names = []
-			codes = []
-			cant  = []
-
-			for i, item in enumerate(self.nombres_disponibles):
-
-				if typed.lower() in item.lower():
-
-					names.append(self.nombres_disponibles[i])
-					codes.append(self.codes_disponibles[i])
-					cant.append(self.cantidad_disponible[i])
-
-		elif typed.isdigit() == True:
-			
-			names = []
-			codes = []
-			cant  = []
-
-			for i, item in enumerate(self.codes_disponibles):
-
-				if typed in str(item):
-
-					names.append(self.nombres_disponibles[i])
-					codes.append(self.codes_disponibles[i])
-					cant.append(self.cantidad_disponible[i])
-
-		self.nombres_disponibles_update = names
-		self.codes_disponibles_update   = np.array(codes)
-		self.cantidad_disponible_update = np.array(cant)
-
-		self.update_tree_stocks()
 
 	def quitar_productos(self):
 
@@ -915,16 +667,24 @@ class Stock:
 
 	def agrega_producto(self):
 
-		name              = self.name_new_product
+		barcode           = self.codigo_stock.get(1.0, "end-1c")
 		precio            = self.valor_compra_stock.get(1.0, "end-1c")
 		amount            = self.cantidad_entra_stock.get(1.0, "end-1c")
 
-		if name == '':
+		if barcode == '':
 
 			# ventana de notificacion de que el barcode está vacío
 			self.notifica = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Notificacion Existencias', 0, 2, exitgrid=True)
 			self.etiqueta(self.notifica, '¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'No se ha selecccionado aún un nombre.', 0, 1, grid=True)
+			self.etiqueta(self.notifica, u'Código de barras vacío. Campo requerido', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_alimstock)
+
+		elif barcode.isdigit() == False: # si no fuera digito la consulta en base de datos no se podría hacer y tampoco se dejaría ingresar el producto a la bd
+
+			# ventana de notificacion de que el barcode está errado
+			self.notifica = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Notificacion Existencias', 0, 2, exitgrid=True)
+			self.etiqueta(self.notifica, '¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'Código de barras errado. Caracteres inválidos', 0, 1, grid=True)
 			self.final_otra_ventana(self.notifica, self.ventana_alimstock)
 
 		elif precio == '':
@@ -961,20 +721,43 @@ class Stock:
 
 		else:
 
-			self.minimum_price_factura()
+			#----------------------- decide si el producto cuyo código de barras fue ingresado existe o no -------------------------
+
+			db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
+			db_cursor  = db_conn.cursor()
+			db_cursor.execute("SELECT nombre_producto FROM productos WHERE codigo_barras = " + barcode + ";")
+			decide_existencia = db_cursor.fetchall()
+			db_conn.close ()
+
+			item_existe = False
+
+			if len(decide_existencia) == 1:
+				item_existe     = True
+				self.nombre_producto = decide_existencia[0][0]
+
+			#------------------------- inserta los datos si el item existe ----------------------------------
+
+			if item_existe == True:
+
+				self.minimum_price_factura()
+
+			else:
+
+				# ventana de notificacion de que el item no existe
+				self.notifica = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Notificacion Existencias', 0, 3, exitgrid=True)
+				self.etiqueta(self.notifica, '¡¡¡ERROR!!!', 0, 0, grid=True)
+				self.etiqueta(self.notifica, u'El código de barras ingresado no existe en la base de datos', 0, 1, grid=True)
+				self.etiqueta(self.notifica, u'Alimentar primero el item', 0, 2, grid=True)
+				self.final_otra_ventana(self.notifica, self.ventana_alimstock)
 
 	def inserta_producto(self):
 
-		if self.bool_exist_new_name == True:
-			barcode = self.code_new_product
-		else:
-			barcode = ''
-
+		barcode = self.codigo_stock.get(1.0, "end-1c")
 		precio  = self.valor_compra_stock.get(1.0, "end-1c")
 		amount  = self.cantidad_entra_stock.get(1.0, "end-1c")
 		valor   = self.precio_venta_stock.get(1.0, "end-1c")
 
-		VALUES  = (self.name_new_product, barcode, precio, amount, valor, int(precio)*int(amount), self.precio_minimo_stocks) 
+		VALUES  = (self.nombre_producto, barcode, precio, amount, valor, int(precio)*int(amount)) 
 
 		self.tree2.insert('', END, text='', values=VALUES, iid=self.conteo)
 
@@ -985,33 +768,26 @@ class Stock:
 
 	def minimum_price_factura(self):
 
+		barcode = self.codigo_stock.get(1.0, "end-1c")
 		amount  = int(self.cantidad_entra_stock.get(1.0, "end-1c"))
 		precio  = int(self.valor_compra_stock.get(1.0, "end-1c"))
 
-		if self.bool_exist_new_name == True:
+		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
+		db_cursor  = db_conn.cursor()
+		db_cursor.execute("SELECT precio_minimo_venta FROM productos WHERE codigo_barras = " + barcode)
+		mp         = db_cursor.fetchall()[0][0]
+		db_conn.close ()
 
-			barcode = self.code_new_product
+		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
+		db_cursor  = db_conn.cursor()
+		db_cursor.execute("SELECT id FROM stocks WHERE codigo_barras_id = " + barcode + " AND estado = 'En Stock'")
+		disp       = db_cursor.fetchall()
+		db_conn.close ()
 
-			db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-			db_cursor  = db_conn.cursor()
-			db_cursor.execute("SELECT precio_minimo_venta FROM productos WHERE codigo_barras = " + str(self.code_new_product))
-			mp         = db_cursor.fetchall()[0][0]
-			db_conn.close ()
-
-			db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-			db_cursor  = db_conn.cursor()
-			db_cursor.execute("SELECT id FROM stocks WHERE codigo_barras_id = " + str(self.code_new_product) + " AND estado = 'En Stock'")
-			disp       = db_cursor.fetchall()
-			db_conn.close ()
-
-			if mp == None:
-				self.precio_minimo_stocks = precio
-			else:
-				self.precio_minimo_stocks = (mp * len(disp) + precio * amount)/(len(disp) + amount)
-
-		else:
-
+		if mp == None:
 			self.precio_minimo_stocks = precio
+		else:
+			self.precio_minimo_stocks = (mp * len(disp) + precio * amount)/(len(disp) + amount)
 
 		self.ventana_mp = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Precio de venta', 1, 5, 'Cancelar', exitgrid=True)
 		self.etiqueta(self.ventana_mp, u'Precio mínimo de venta:', 0, 0, grid=True).grid(columnspan=3)
@@ -1127,14 +903,10 @@ class Stock:
 		valor_bill   = self.valor_factura.get(1.0, "end-1c")
 		provee_bill  = self.proveedor_factura.get(1.0, "end-1c")
 		code_bill    = self.codigo_factura.get(1.0, "end-1c")
-		metodo_pago   = ['contado', 'credito'][self.RB.get()]
 
 		db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
 		db_cursor  = db_conn.cursor()
-		if metodo_pago == 'credito':
-			db_cursor.execute("INSERT INTO adquisiciones_credito (id_factura_credito, valor_factura, fecha_factura, fecha_ingreso_factura, pagada, proveedor) VALUES ('" + code_bill + "', " + valor_bill + ", '" + date_bill + "', '" + current_time + "', 0, '" + provee_bill + "');")
-		if metodo_pago == 'contado':
-			db_cursor.execute("INSERT INTO adquisiciones_credito (id_factura_credito, valor_factura, fecha_factura, fecha_ingreso_factura, pagada, proveedor) VALUES ('" + code_bill + "', " + valor_bill + ", '" + date_bill + "', '" + current_time + "', 1, '" + provee_bill + "');")
+		db_cursor.execute("INSERT INTO adquisiciones_credito (id_factura_credito, valor_factura, fecha_factura, fecha_ingreso_factura, pagada, proveedor) VALUES ('" + code_bill + "', " + valor_bill + ", '" + date_bill + "', '" + current_time + "', 0, '" + provee_bill + "');")
 		db_cursor.close()
 		db_conn.commit ()
 		db_conn.close ()
@@ -1142,40 +914,20 @@ class Stock:
 		#--------------------------------------- luego registra los productos -------------------------------------------
 
 		for record in self.tree2.get_children(): # recorre cada entrada de la tabla 2
-			
-			name          = self.tree2.item(record, 'values')[0]
 			barcode       = self.tree2.item(record, 'values')[1]
 			precio        = self.tree2.item(record, 'values')[2]
 			amount        = self.tree2.item(record, 'values')[3]
 			costo         = self.tree2.item(record, 'values')[4]
-			precio_minimo = self.tree2.item(record, 'values')[6]
+			precio_minimo = str(self.precio_minimo_stocks)
 			state         = 'En Stock'
 
-			if barcode == '': # es decir que el producto no existe en base de datos
-
-				db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-				db_cursor  = db_conn.cursor()
-				db_cursor.execute("INSERT INTO productos (nombre_producto, tiene_imei, precio_minimo_venta) VALUES ('" + name + "', 0, " + str(precio_minimo) + ");")
-				db_cursor.close()
-				db_conn.commit ()
-				db_conn.close ()
-
-				db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
-				db_cursor  = db_conn.cursor()
-				db_cursor.execute("SELECT codigo_barras FROM productos where nombre_producto = '" + name + "';")
-				barcode    = db_cursor.fetchall()[0][0]
-				db_cursor.close()
-				db_conn.commit ()
-				db_conn.close ()
-
 			for i in range(int(amount)):
-
 				db_conn    = MySQLdb.connect(self.host, self.user, self.passwd, self.dbname)
 				db_cursor  = db_conn.cursor()
-				db_cursor.execute("INSERT INTO stocks (codigo_barras_id, fecha_entrada, valor_compra, estado, proveedor, precio_venta, adquisicion, precio_minimo_venta, id_factura) VALUES (" + str(barcode) + ", '" + current_time + "', " + precio + ", '" + state + "', '" + provee_bill + "', " + costo + ", '" + metodo_pago + "', " + precio_minimo + ", '" + code_bill + "');")
-				db_cursor.execute("UPDATE stocks SET precio_venta = " + costo + " WHERE codigo_barras_id = " + str(barcode) + " AND estado = 'En Stock';")
-				db_cursor.execute("UPDATE stocks SET precio_minimo_venta = " + precio_minimo + " WHERE codigo_barras_id = " + str(barcode) + " AND estado = 'En Stock';")
-				db_cursor.execute("UPDATE productos SET precio_minimo_venta = " + precio_minimo + " WHERE codigo_barras = " + str(barcode) + ";")
+				db_cursor.execute("INSERT INTO stocks (codigo_barras_id, fecha_entrada, valor_compra, estado, proveedor, precio_venta, adquisicion, precio_minimo_venta, id_factura) VALUES (" + barcode + ", '" + current_time + "', " + precio + ", '" + state + "', '" + provee_bill + "', " + costo + ", 'credito', " + precio_minimo + ", '" + code_bill + "');")
+				db_cursor.execute("UPDATE stocks SET precio_venta = " + costo + " WHERE codigo_barras_id = " + barcode + " AND estado = 'En Stock';")
+				db_cursor.execute("UPDATE stocks SET precio_minimo_venta = " + precio_minimo + " WHERE codigo_barras_id = " + barcode + " AND estado = 'En Stock';")
+				db_cursor.execute("UPDATE productos SET precio_minimo_venta = " + precio_minimo + " WHERE codigo_barras = " + barcode + ";")
 				db_cursor.close()
 				db_conn.commit ()
 				db_conn.close ()
@@ -1241,7 +993,7 @@ class Stock:
 		# introduce los datos a la tabla
 		for i in range(len(self.proveedores_disponibles_update)):
 			nombre_provee = self.proveedores_disponibles_update[i]
-			VALUES        = (nombre_provee, '')
+			VALUES        = (nombre_provee)
 			self.tree.insert('', END, text='', values=VALUES, iid=i)
 
 	def consulta_proveedor(self):
@@ -1305,8 +1057,7 @@ class Stock:
 
 	def delete_productos_factura(self):
 
-		self.name_new_product = ''
-		self.lbl_name_products.configure(text=self.name_new_product, foreground='red')
+		self.codigo_stock.delete('1.0', END)
 		self.valor_compra_stock.delete('1.0', END)
 		self.cantidad_entra_stock.delete('1.0', END)
 

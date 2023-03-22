@@ -44,8 +44,6 @@ class Aplicacion(_clientes.Clientes, _vendedores.Vendedores, _ventas.Ventas, _cr
 
 		self.guarda_facturas = "/home/yordan/YORDAN/inventario_donhector/facturas/"
 
-
-
 	def despliega_ventana(self):
 
 		self.raiz.mainloop()
