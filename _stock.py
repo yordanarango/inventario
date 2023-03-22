@@ -573,7 +573,7 @@ class Stock:
 
 		self.conteo = 0
 
-		#------------------------------------- Crea las caja para el total -----------------------------------------------
+		#------------------------------------- Crea las cajas para el total -----------------------------------------------
 
 		self.etiqueta(self.ventana_alimstock, u'Total', 6, 17, grid=True)
 		self.box_total = self.caja_texto(self.ventana_alimstock, 1.4, 25, 7, 17, grid=True)
@@ -1024,9 +1024,12 @@ class Stock:
 
 	def verifica_factura(self):
 
-		date_bill  = self.fecha_factura.get(1.0, "end-1c")
-		value_bill = self.valor_factura.get(1.0, "end-1c")
-
+		date_bill      = self.fecha_factura.get(1.0, "end-1c")
+		value_bill     = self.valor_factura.get(1.0, "end-1c")
+		suma_bill      = self.box_total.get(1.0, "end-1c")
+		proveedor_bill = self.proveedor_factura.get(1.0, "end-1c")
+		code_bill      = self.codigo_factura.get(1.0, "end-1c")
+  
 		try:
 			right_date = True
 			date_bill    = dt.datetime.strptime(date_bill, '%Y-%m-%d').strftime('%Y-%m-%d')
@@ -1038,7 +1041,7 @@ class Stock:
 			# ventana de notificacion de que el barcode está vacío
 			self.notifica = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Notificacion Existencias', 0, 2, exitgrid=True)
 			self.etiqueta(self.notifica, '¡¡¡ERROR!!!', 0, 0, grid=True)
-			self.etiqueta(self.notifica, u'Código de barras vacío. Campo requerido', 0, 1, grid=True)
+			self.etiqueta(self.notifica, u'La casilla "Fecha en factura" es obligatoria', 0, 1, grid=True)
 			self.final_otra_ventana(self.notifica, self.ventana_alimstock)
 
 		elif right_date == False:
@@ -1073,6 +1076,30 @@ class Stock:
 			self.notifica = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Notificacion Factura', 0, 2, exitgrid=True)
 			self.etiqueta(self.notifica, '¡¡¡ERROR!!!', 0, 0, grid=True)
 			self.etiqueta(self.notifica, u'Proveedor vacío. Campo requerido', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_alimstock)
+
+		elif proveedor_bill == '':
+
+			# ventana de notificacion de que el barcode está vacío
+			self.notifica = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Notificacion Factura', 0, 2, exitgrid=True)
+			self.etiqueta(self.notifica, '¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'La casilla "Proveedor" es obligatoria', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_alimstock)
+
+		elif code_bill == '':
+      
+			# ventana de notificacion de que el barcode está vacío
+			self.notifica = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Notificacion Factura', 0, 2, exitgrid=True)
+			self.etiqueta(self.notifica, '¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'La casilla "Código factura" es obligatoria', 0, 1, grid=True)
+			self.final_otra_ventana(self.notifica, self.ventana_alimstock)
+
+		elif suma_bill == '':
+
+			# ventana de notificacion de que el barcode está vacío
+			self.notifica = self.otra_ventana(self.ventana_alimstock, '+300+270', u'Notificacion Factura', 0, 2, exitgrid=True)
+			self.etiqueta(self.notifica, '¡¡¡ERROR!!!', 0, 0, grid=True)
+			self.etiqueta(self.notifica, u'No se han ingresado los productos de la factura', 0, 1, grid=True)
 			self.final_otra_ventana(self.notifica, self.ventana_alimstock)
 
 		else:
